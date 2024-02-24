@@ -20,47 +20,131 @@ import React from "react";
 import "./App.css";
 
 function App() {
-  const [value, setValue] = React.useState(0);
   enum TrainClass {
     First = "Klasa 1",
     Second = "Klasa 2",
   }
-
-  const tickets: Ticket[] = [
-    {
-      id: 1,
-      ticketNumber: new Date().valueOf(),
-      day: new Date(2024, 2, 24).toLocaleDateString(),
-      start: new Date(2024, 2, 24, 13, 35, 0).toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "numeric",
-      }),
-      end: new Date(2024, 2, 24, 17, 14, 0).toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "numeric",
-      }),
-      trainClass: TrainClass.First,
-      interCityNumber: 1234,
-      stations: [
-        "Warszawa Centralna",
-        "Warszawa Zachodnia",
-        "Grodzisk Mazowiecki PKP",
-        "Żyrardów",
-        "Skierniewice",
-        "Koluszki",
-        "Tomaszów Mazowiecki",
-        "Idzikowice",
-        "Opoczno Południe",
-        "Włoszczowa Północ",
-        "Miechów",
-        "Kraków Główny",
-      ],
-      price: "169,00 zł",
-    },
-  ];
+  // const tickets: Ticket[] = [
+  //   {
+  //     id: 1,
+  //     ticketNumber: new Date().valueOf(),
+  //     day: new Date(2024, 2, 24).toLocaleDateString(),
+  //     start: new Date(2024, 2, 24, 13, 35, 0).toLocaleTimeString([], {
+  //       hour: "numeric",
+  //       minute: "numeric",
+  //     }),
+  //     end: new Date(2024, 2, 24, 17, 14, 0).toLocaleTimeString([], {
+  //       hour: "numeric",
+  //       minute: "numeric",
+  //     }),
+  //     trainClass: TrainClass.First,
+  //     interCityNumber: 1234,
+  //     stations: [
+  //       "Warszawa Centralna",
+  //       "Warszawa Zachodnia",
+  //       "Grodzisk Mazowiecki PKP",
+  //       "Żyrardów",
+  //       "Skierniewice",
+  //       "Koluszki",
+  //       "Tomaszów Mazowiecki",
+  //       "Idzikowice",
+  //       "Opoczno Południe",
+  //       "Włoszczowa Północ",
+  //       "Miechów",
+  //       "Kraków Główny",
+  //     ],
+  //     price: "169,00 zł",
+  //   },
+  // ];
+  // const [tabNumber, setTabNumber] = React.useState(0);
+  // const [filteredTickets, setFilteredTickets] = React.useState(tickets);
+  const [state, setState] = React.useState({
+    tabNumber: 0,
+    searchPhrase: "",
+    tickets: [
+      {
+        id: 1,
+        ticketNumber: new Date().valueOf(),
+        day: new Date(2024, 2, 24).toLocaleDateString(),
+        start: new Date(2024, 2, 24, 13, 35, 0).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "numeric",
+        }),
+        end: new Date(2024, 2, 24, 17, 14, 0).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "numeric",
+        }),
+        trainClass: TrainClass.First,
+        interCityNumber: 1234,
+        stations: [
+          "Warszawa Centralna",
+          "Warszawa Zachodnia",
+          "Grodzisk Mazowiecki PKP",
+          "Żyrardów",
+          "Skierniewice",
+          "Koluszki",
+          "Tomaszów Mazowiecki",
+          "Idzikowice",
+          "Opoczno Południe",
+          "Włoszczowa Północ",
+          "Miechów",
+          "Kraków Główny",
+        ],
+        price: "169,00 zł",
+      },
+    ],
+    filteredTickets: [
+      {
+        id: 1,
+        ticketNumber: new Date().valueOf(),
+        day: new Date(2024, 2, 24).toLocaleDateString(),
+        start: new Date(2024, 2, 24, 13, 35, 0).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "numeric",
+        }),
+        end: new Date(2024, 2, 24, 17, 14, 0).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "numeric",
+        }),
+        trainClass: TrainClass.First,
+        interCityNumber: 1234,
+        stations: [
+          "Warszawa Centralna",
+          "Warszawa Zachodnia",
+          "Grodzisk Mazowiecki PKP",
+          "Żyrardów",
+          "Skierniewice",
+          "Koluszki",
+          "Tomaszów Mazowiecki",
+          "Idzikowice",
+          "Opoczno Południe",
+          "Włoszczowa Północ",
+          "Miechów",
+          "Kraków Główny",
+        ],
+        price: "169,00 zł",
+      },
+    ],
+  });
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+    setState((prevState) => ({ ...prevState, tabNumber: newValue }));
+  };
+
+  const handleSearchPhraseChange = (event) => {
+    const searchPhrase = (event.target.value as string).toLowerCase();
+    const filteredTickets = state.tickets.filter(
+      (ticket) =>
+        ticket.stations[0].toLowerCase().includes(searchPhrase) ||
+        ticket.stations[ticket.stations.length - 1]
+          .toLowerCase()
+          .includes(searchPhrase)
+    );
+    setState((prevState) => ({
+      ...prevState,
+      searchPhrase: event.target.value,
+      filteredTickets: filteredTickets,
+    }));
   };
 
   interface TabPanelProps {
@@ -99,14 +183,17 @@ function App() {
   return (
     <Box className="container">
       <Box className="title">Moje bilety</Box>
-      <Tabs value={value} onChange={handleChange}>
+      <Tabs value={state.tabNumber} onChange={handleChange}>
         <Tab label="Bilety" />
         <Tab label="Historia podróży" />
         <Tab label="Zwrócone" />
       </Tabs>
-      <CustomTabPanel value={value} index={0}>
+      <CustomTabPanel value={state.tabNumber} index={0}>
         <Box>
           <TextField
+            autoFocus
+            value={state.searchPhrase}
+            onChange={handleSearchPhraseChange}
             id="input-with-icon-textfield"
             label="Szukaj biletu"
             sx={{ width: "40vw" }}
@@ -139,7 +226,7 @@ function App() {
           </Button>
         </Box>
 
-        {tickets.map((ticket) => {
+        {state.filteredTickets.map((ticket) => {
           return (
             <Box sx={{ border: "1px solid lightgrey", padding: "1rem" }}>
               <Box
@@ -289,10 +376,10 @@ function App() {
           );
         })}
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
+      <CustomTabPanel value={state.tabNumber} index={1}>
         TODO
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
+      <CustomTabPanel value={state.tabNumber} index={2}>
         TODO
       </CustomTabPanel>
     </Box>
