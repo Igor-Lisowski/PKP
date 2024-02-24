@@ -21,6 +21,36 @@ import "./App.css";
 
 function App() {
   const [value, setValue] = React.useState(0);
+  enum TrainClass {
+    First = "1",
+    Second = "2",
+  }
+
+  const tickets: Ticket[] = [
+    {
+      id: 1,
+      ticketNumber: new Date().valueOf(),
+      start: new Date(2024, 2, 24, 13, 35, 0),
+      end: new Date(2024, 2, 24, 17, 14, 0),
+      trainClass: TrainClass.First,
+      interCityNumber: 1234,
+      stations: [
+        "Warszawa Centralna",
+        "Warszawa Zachodnia",
+        "Grodzisk Mazowiecki PKP",
+        "Żyrardów",
+        "Skierniewice",
+        "Koluszki",
+        "Tomaszów Mazowiecki",
+        "Idzikowice",
+        "Opoczno Południe",
+        "Włoszczowa Północ",
+        "Miechów",
+        "Kraków Główny",
+      ],
+      price: 169,
+    },
+  ];
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -30,6 +60,17 @@ function App() {
     children?: React.ReactNode;
     index: number;
     value: number;
+  }
+
+  interface Ticket {
+    id: number;
+    ticketNumber: number;
+    start: Date;
+    end: Date;
+    trainClass: TrainClass;
+    interCityNumber: number;
+    stations: string[];
+    price: number;
   }
 
   function CustomTabPanel(props: TabPanelProps) {
@@ -89,147 +130,166 @@ function App() {
             Dodaj bilet okresowy
           </Button>
         </Box>
-        <Box sx={{ border: "1px solid lightgrey", padding: "1rem" }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-            }}
-          >
-            <Box
-              sx={{
-                backgroundColor: "lightgrey",
-                width: "fit-content",
-                padding: "0.5rem",
-                borderRadius: "3px",
-              }}
-            >
-              <Box component="span" sx={{ color: "blue" }}>
-                Numer biletu
-              </Box>
-              &emsp;
-              <Box component="span" sx={{ color: "darkblue" }}>
-                XX123456789
-              </Box>
-            </Box>
-            <Box>
-              <Button size="small">Trasa twojego pociągu</Button>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              marginTop: "1rem",
-              display: "grid",
-              gridTemplateColumns: "2fr 1fr",
-            }}
-          >
-            <Box>
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gridTemplateRows: "repeat(2, 1fr)",
-                }}
-              >
-                <Box sx={{ color: "blue" }}>Data</Box>
-                <Box sx={{ color: "blue" }}>Czas</Box>
-                <Box sx={{ color: "blue" }}>Klasa</Box>
-                <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                  DD.MM.YYYY
-                </Box>
-                <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                  HH:MM{" "}
-                  <ArrowForwardIos
-                    sx={{
-                      fontSize: "0.75rem",
-                      color: "darkorange",
-                    }}
-                  />{" "}
-                  HH:MM
-                </Box>
-                <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                  123,45 zł
-                </Box>
-              </Box>
 
+        {tickets.map((ticket) => {
+          return (
+            <Box sx={{ border: "1px solid lightgrey", padding: "1rem" }}>
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "column",
-                  gap: "0.5rem",
-                  marginTop: "1rem",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
                 }}
               >
-                <Box sx={{ color: "blue" }}>Trasa</Box>
-                <Box>
-                  Warszawa Cent.{" "}
-                  <ArrowForwardIos
-                    sx={{
-                      fontSize: "0.75rem",
-                      color: "darkorange",
-                    }}
-                  />{" "}
-                  Kraków Gł.
+                <Box
+                  sx={{
+                    backgroundColor: "lightgrey",
+                    width: "fit-content",
+                    padding: "0.5rem",
+                    borderRadius: "3px",
+                  }}
+                >
+                  <Box component="span" sx={{ color: "blue" }}>
+                    Numer biletu
+                  </Box>
+                  &emsp;
+                  <Box component="span" sx={{ color: "darkblue" }}>
+                    {ticket.ticketNumber}
+                  </Box>
                 </Box>
+                <Box>
+                  <Button size="small">Trasa twojego pociągu</Button>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  marginTop: "1rem",
+                  display: "grid",
+                  gridTemplateColumns: "2fr 1fr",
+                }}
+              >
                 <Box>
                   <Box
-                    component="span"
                     sx={{
-                      color: "darkorange",
-                      fontStyle: "italic",
-                      fontWeight: "bold",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, 1fr)",
+                      gridTemplateRows: "repeat(2, 1fr)",
                     }}
                   >
-                    IC
+                    <Box sx={{ color: "blue" }}>Data</Box>
+                    <Box sx={{ color: "blue" }}>Czas</Box>
+                    <Box sx={{ color: "blue" }}>Klasa {ticket.trainClass}</Box>
+                    <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
+                      {ticket.start.toLocaleString([], {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric",
+                      })}
+                    </Box>
+                    <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
+                      {ticket.start.toLocaleString([], {
+                        hour: "numeric",
+                        minute: "numeric",
+                      })}{" "}
+                      <ArrowForwardIos
+                        sx={{
+                          fontSize: "0.75rem",
+                          color: "darkorange",
+                        }}
+                      />{" "}
+                      {ticket.end.toLocaleString([], {
+                        hour: "numeric",
+                        minute: "numeric",
+                      })}
+                    </Box>
+                    <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
+                      {ticket.price.toFixed(2).replace(".", ",")} zł
+                    </Box>
                   </Box>
-                  &nbsp;2620
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.5rem",
+                      marginTop: "1rem",
+                    }}
+                  >
+                    <Box sx={{ color: "blue" }}>Trasa</Box>
+                    <Box>
+                      {ticket.stations[0]}{" "}
+                      <ArrowForwardIos
+                        sx={{
+                          fontSize: "0.75rem",
+                          color: "darkorange",
+                        }}
+                      />{" "}
+                      {ticket.stations[ticket.stations.length - 1]}
+                    </Box>
+                    <Box>
+                      <Box
+                        component="span"
+                        sx={{
+                          color: "darkorange",
+                          fontStyle: "italic",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        IC
+                      </Box>
+                      &nbsp;{ticket.interCityNumber}
+                    </Box>
+                  </Box>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <Box>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      sx={{
+                        backgroundColor: "white",
+                        color: "darkorange",
+                        fontWeight: "bold",
+                        width: "100%",
+                      }}
+                    >
+                      Pobierz PDF
+                    </Button>
+                  </Box>
+                  <Box>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      sx={{
+                        backgroundColor: "white",
+                        color: "darkorange",
+                        fontWeight: "bold",
+                        width: "100%",
+                      }}
+                    >
+                      Stwórz profil zakupowy
+                    </Button>
+                  </Box>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMore />}
+                      sx={{ textTransform: "uppercase" }}
+                    >
+                      Inne funkcje dla tego biletu
+                    </AccordionSummary>
+                    <AccordionDetails>TODO</AccordionDetails>
+                  </Accordion>
                 </Box>
               </Box>
             </Box>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-            >
-              <Box>
-                <Button
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    backgroundColor: "white",
-                    color: "darkorange",
-                    fontWeight: "bold",
-                    width: "100%",
-                  }}
-                >
-                  Pobierz PDF
-                </Button>
-              </Box>
-              <Box>
-                <Button
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    backgroundColor: "white",
-                    color: "darkorange",
-                    fontWeight: "bold",
-                    width: "100%",
-                  }}
-                >
-                  Stwórz profil zakupowy
-                </Button>
-              </Box>
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  sx={{ textTransform: "uppercase" }}
-                >
-                  Inne funkcje dla tego biletu
-                </AccordionSummary>
-                <AccordionDetails>TODO</AccordionDetails>
-              </Accordion>
-            </Box>
-          </Box>
-        </Box>
+          );
+        })}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         TODO
@@ -237,20 +297,6 @@ function App() {
       <CustomTabPanel value={value} index={2}>
         TODO
       </CustomTabPanel>
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React.js
-        </a>
-      </header> */}
     </Box>
   );
 }
