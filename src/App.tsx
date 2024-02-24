@@ -22,16 +22,23 @@ import "./App.css";
 function App() {
   const [value, setValue] = React.useState(0);
   enum TrainClass {
-    First = "1",
-    Second = "2",
+    First = "Klasa 1",
+    Second = "Klasa 2",
   }
 
   const tickets: Ticket[] = [
     {
       id: 1,
       ticketNumber: new Date().valueOf(),
-      start: new Date(2024, 2, 24, 13, 35, 0),
-      end: new Date(2024, 2, 24, 17, 14, 0),
+      day: new Date(2024, 2, 24).toLocaleDateString(),
+      start: new Date(2024, 2, 24, 13, 35, 0).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "numeric",
+      }),
+      end: new Date(2024, 2, 24, 17, 14, 0).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "numeric",
+      }),
       trainClass: TrainClass.First,
       interCityNumber: 1234,
       stations: [
@@ -48,7 +55,7 @@ function App() {
         "Miechów",
         "Kraków Główny",
       ],
-      price: 169,
+      price: "169,00 zł",
     },
   ];
 
@@ -65,12 +72,13 @@ function App() {
   interface Ticket {
     id: number;
     ticketNumber: number;
-    start: Date;
-    end: Date;
+    day: string;
+    start: string;
+    end: string;
     trainClass: TrainClass;
     interCityNumber: number;
     stations: string[];
-    price: number;
+    price: string;
   }
 
   function CustomTabPanel(props: TabPanelProps) {
@@ -178,32 +186,22 @@ function App() {
                   >
                     <Box sx={{ color: "blue" }}>Data</Box>
                     <Box sx={{ color: "blue" }}>Czas</Box>
-                    <Box sx={{ color: "blue" }}>Klasa {ticket.trainClass}</Box>
+                    <Box sx={{ color: "blue" }}>{ticket.trainClass}</Box>
                     <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                      {ticket.start.toLocaleString([], {
-                        year: "numeric",
-                        month: "numeric",
-                        day: "numeric",
-                      })}
+                      {ticket.day}
                     </Box>
                     <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                      {ticket.start.toLocaleString([], {
-                        hour: "numeric",
-                        minute: "numeric",
-                      })}{" "}
+                      {ticket.start}{" "}
                       <ArrowForwardIos
                         sx={{
                           fontSize: "0.75rem",
                           color: "darkorange",
                         }}
                       />{" "}
-                      {ticket.end.toLocaleString([], {
-                        hour: "numeric",
-                        minute: "numeric",
-                      })}
+                      {ticket.end}
                     </Box>
                     <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                      {ticket.price.toFixed(2).replace(".", ",")} zł
+                      {ticket.price}
                     </Box>
                   </Box>
 
