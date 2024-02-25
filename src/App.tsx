@@ -11,53 +11,21 @@ import {
   AccordionSummary,
   Box,
   Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
   InputAdornment,
+  Modal,
   Tab,
   Tabs,
   TextField,
 } from "@mui/material";
 import React from "react";
 import "./App.css";
+import { TabPanelProps } from "./models/tab-panel-props.model";
+import { Ticket } from "./models/ticket.model";
 
 function App() {
-  enum TrainClass {
-    First = "Klasa 1",
-    Second = "Klasa 2",
-  }
-  // const tickets: Ticket[] = [
-  //   {
-  //     id: 1,
-  //     ticketNumber: new Date().valueOf(),
-  //     day: new Date(2024, 2, 24).toLocaleDateString(),
-  //     start: new Date(2024, 2, 24, 13, 35, 0).toLocaleTimeString([], {
-  //       hour: "numeric",
-  //       minute: "numeric",
-  //     }),
-  //     end: new Date(2024, 2, 24, 17, 14, 0).toLocaleTimeString([], {
-  //       hour: "numeric",
-  //       minute: "numeric",
-  //     }),
-  //     trainClass: TrainClass.First,
-  //     interCityNumber: 1234,
-  //     stations: [
-  //       "Warszawa Centralna",
-  //       "Warszawa Zachodnia",
-  //       "Grodzisk Mazowiecki PKP",
-  //       "Żyrardów",
-  //       "Skierniewice",
-  //       "Koluszki",
-  //       "Tomaszów Mazowiecki",
-  //       "Idzikowice",
-  //       "Opoczno Południe",
-  //       "Włoszczowa Północ",
-  //       "Miechów",
-  //       "Kraków Główny",
-  //     ],
-  //     price: "169,00 zł",
-  //   },
-  // ];
-  // const [tabNumber, setTabNumber] = React.useState(0);
-  // const [filteredTickets, setFilteredTickets] = React.useState(tickets);
   const [state, setState] = React.useState({
     tabNumber: 0,
     searchPhrase: "",
@@ -74,7 +42,7 @@ function App() {
           hour: "numeric",
           minute: "numeric",
         }),
-        trainClass: TrainClass.First,
+        trainClass: "Klasa 1",
         interCityNumber: 1234,
         stations: [
           "Warszawa Centralna",
@@ -106,7 +74,7 @@ function App() {
           hour: "numeric",
           minute: "numeric",
         }),
-        trainClass: TrainClass.First,
+        trainClass: "Klasa 1",
         interCityNumber: 1234,
         stations: [
           "Warszawa Centralna",
@@ -125,6 +93,8 @@ function App() {
         price: "169,00 zł",
       },
     ],
+    isFilterModalOpen: false,
+    classFilters: [true, true],
   });
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -133,48 +103,50 @@ function App() {
 
   const handleSearchPhraseChange = (event) => {
     const searchPhrase = (event.target.value as string).toLowerCase();
-    const filteredTickets = state.tickets.filter(
-      (ticket) =>
-        ticket.stations[0].toLowerCase().includes(searchPhrase) ||
-        ticket.stations[ticket.stations.length - 1]
-          .toLowerCase()
-          .includes(searchPhrase)
-    );
     setState((prevState) => ({
       ...prevState,
       searchPhrase: event.target.value,
-      filteredTickets: filteredTickets,
+      filteredTickets: getFilteredTickets(searchPhrase),
     }));
   };
 
-  interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
+  function handleFilterModalClose() {
+    setState({
+      ...state,
+      filteredTickets: getFilteredTickets(state.searchPhrase),
+      isFilterModalOpen: false,
+    });
   }
 
-  interface Ticket {
-    id: number;
-    ticketNumber: number;
-    day: string;
-    start: string;
-    end: string;
-    trainClass: TrainClass;
-    interCityNumber: number;
-    stations: string[];
-    price: string;
+  function getFilteredTickets(searchPhrase: string) {
+    const filteredTickets = state.tickets.filter(
+      (ticket) =>
+        isSearchPhraseIncluded(ticket, searchPhrase) &&
+        isTrainClassIncluded(ticket)
+    );
+    return filteredTickets;
+  }
+
+  function isSearchPhraseIncluded(ticket, searchPhrase: string) {
+    return (
+      ticket.stations[0].toLowerCase().includes(searchPhrase) ||
+      ticket.stations[ticket.stations.length - 1]
+        .toLowerCase()
+        .includes(searchPhrase)
+    );
+  }
+
+  function isTrainClassIncluded(ticket: Ticket) {
+    return (
+      (ticket.trainClass === "Klasa 1" && state.classFilters[0]) ||
+      (ticket.trainClass === "Klasa 2" && state.classFilters[1])
+    );
   }
 
   function CustomTabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
     return (
-      <Box
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
+      <Box hidden={value !== index} {...other}>
         {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
       </Box>
     );
@@ -207,12 +179,103 @@ function App() {
             variant="standard"
           />
           <Button
+            onClick={() => setState({ ...state, isFilterModalOpen: true })}
             variant="outlined"
             sx={{ mt: "12px", ml: "6px", width: "19.4vw" }}
             endIcon={<FilterList />}
           >
             Filtry
           </Button>
+          <Modal
+            open={state.isFilterModalOpen}
+            onClose={handleFilterModalClose}
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "20vw",
+                bgcolor: "background.paper",
+                border: "2px solid lightgrey",
+                borderRadius: "5px",
+                boxShadow: 24,
+                p: 4,
+                textAlign: "center",
+              }}
+            >
+              <Box component="h3" sx={{ color: "darkblue" }}>
+                Filtry
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <FormControl>
+                  <FormControlLabel
+                    label="Parent"
+                    control={
+                      <Checkbox
+                        checked={state.classFilters[0] && state.classFilters[1]}
+                        indeterminate={
+                          state.classFilters[0] !== state.classFilters[1]
+                        }
+                        onChange={() =>
+                          setState({
+                            ...state,
+                            classFilters:
+                              state.classFilters[0] && state.classFilters[1]
+                                ? [false, false]
+                                : [true, true],
+                          })
+                        }
+                      />
+                    }
+                  />
+                  <Box sx={{ display: "flex", flexDirection: "column", ml: 3 }}>
+                    <FormControlLabel
+                      label="Klasa 1"
+                      control={
+                        <Checkbox
+                          checked={state.classFilters[0]}
+                          onChange={() =>
+                            setState({
+                              ...state,
+                              classFilters: [
+                                !state.classFilters[0],
+                                state.classFilters[1],
+                              ],
+                            })
+                          }
+                        />
+                      }
+                    />
+                    <FormControlLabel
+                      label="Klasa 2"
+                      control={
+                        <Checkbox
+                          checked={state.classFilters[1]}
+                          onChange={() =>
+                            setState({
+                              ...state,
+                              classFilters: [
+                                state.classFilters[0],
+                                !state.classFilters[1],
+                              ],
+                            })
+                          }
+                        />
+                      }
+                    />
+                  </Box>
+                </FormControl>
+                <FormControl>
+                  <FormControlLabel
+                    control={<Checkbox defaultChecked />}
+                    label="Pokaż zakończone"
+                  />
+                </FormControl>
+              </Box>
+            </Box>
+          </Modal>
         </Box>
         <Box
           sx={{
