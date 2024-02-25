@@ -11,17 +11,15 @@ import {
   AccordionSummary,
   Box,
   Button,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
   InputAdornment,
-  Modal,
   Tab,
   Tabs,
   TextField,
 } from "@mui/material";
 import React from "react";
 import "./App.css";
+import FilterModalComponent from "./components/FilterModal.tsx";
+import RouteModalComponent from "./components/RouteModal.tsx";
 import { TabPanelProps } from "./models/tab-panel-props.model";
 import { Ticket } from "./models/ticket.model";
 
@@ -95,6 +93,7 @@ function App() {
     ],
     isFilterModalOpen: false,
     classFilters: [true, true],
+    isRouteModalOpen: false,
   });
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -106,23 +105,24 @@ function App() {
     setState((prevState) => ({
       ...prevState,
       searchPhrase: event.target.value,
-      filteredTickets: getFilteredTickets(searchPhrase),
+      filteredTickets: getFilteredTickets(searchPhrase, state.classFilters),
     }));
   };
 
-  function handleFilterModalClose() {
+  function handleFilterModalClose(classFilters: boolean[]) {
     setState({
       ...state,
-      filteredTickets: getFilteredTickets(state.searchPhrase),
+      classFilters: classFilters,
+      filteredTickets: getFilteredTickets(state.searchPhrase, classFilters),
       isFilterModalOpen: false,
     });
   }
 
-  function getFilteredTickets(searchPhrase: string) {
+  function getFilteredTickets(searchPhrase: string, classFilters: boolean[]) {
     const filteredTickets = state.tickets.filter(
       (ticket) =>
         isSearchPhraseIncluded(ticket, searchPhrase) &&
-        isTrainClassIncluded(ticket)
+        isTrainClassIncluded(ticket, classFilters)
     );
     return filteredTickets;
   }
@@ -136,11 +136,15 @@ function App() {
     );
   }
 
-  function isTrainClassIncluded(ticket: Ticket) {
+  function isTrainClassIncluded(ticket: Ticket, classFilters: boolean[]) {
     return (
-      (ticket.trainClass === "Klasa 1" && state.classFilters[0]) ||
-      (ticket.trainClass === "Klasa 2" && state.classFilters[1])
+      (ticket.trainClass === "Klasa 1" && classFilters[0]) ||
+      (ticket.trainClass === "Klasa 2" && classFilters[1])
     );
+  }
+
+  function handleRouteModalClose() {
+    setState({ ...state, isRouteModalOpen: false });
   }
 
   function CustomTabPanel(props: TabPanelProps) {
@@ -186,96 +190,11 @@ function App() {
           >
             Filtry
           </Button>
-          <Modal
-            open={state.isFilterModalOpen}
-            onClose={handleFilterModalClose}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "20vw",
-                bgcolor: "background.paper",
-                border: "2px solid lightgrey",
-                borderRadius: "5px",
-                boxShadow: 24,
-                p: 4,
-                textAlign: "center",
-              }}
-            >
-              <Box component="h3" sx={{ color: "darkblue" }}>
-                Filtry
-              </Box>
-              <Box sx={{ mt: 2 }}>
-                <FormControl>
-                  <FormControlLabel
-                    label="Parent"
-                    control={
-                      <Checkbox
-                        checked={state.classFilters[0] && state.classFilters[1]}
-                        indeterminate={
-                          state.classFilters[0] !== state.classFilters[1]
-                        }
-                        onChange={() =>
-                          setState({
-                            ...state,
-                            classFilters:
-                              state.classFilters[0] && state.classFilters[1]
-                                ? [false, false]
-                                : [true, true],
-                          })
-                        }
-                      />
-                    }
-                  />
-                  <Box sx={{ display: "flex", flexDirection: "column", ml: 3 }}>
-                    <FormControlLabel
-                      label="Klasa 1"
-                      control={
-                        <Checkbox
-                          checked={state.classFilters[0]}
-                          onChange={() =>
-                            setState({
-                              ...state,
-                              classFilters: [
-                                !state.classFilters[0],
-                                state.classFilters[1],
-                              ],
-                            })
-                          }
-                        />
-                      }
-                    />
-                    <FormControlLabel
-                      label="Klasa 2"
-                      control={
-                        <Checkbox
-                          checked={state.classFilters[1]}
-                          onChange={() =>
-                            setState({
-                              ...state,
-                              classFilters: [
-                                state.classFilters[0],
-                                !state.classFilters[1],
-                              ],
-                            })
-                          }
-                        />
-                      }
-                    />
-                  </Box>
-                </FormControl>
-                <FormControl>
-                  <FormControlLabel
-                    control={<Checkbox defaultChecked />}
-                    label="Pokaż zakończone"
-                  />
-                </FormControl>
-              </Box>
-            </Box>
-          </Modal>
+          <FilterModalComponent
+            isOpen={state.isFilterModalOpen}
+            classFilters={state.classFilters}
+            handleModalClose={handleFilterModalClose}
+          />
         </Box>
         <Box
           sx={{
@@ -316,7 +235,19 @@ function App() {
                   </Box>
                 </Box>
                 <Box>
-                  <Button size="small">Trasa twojego pociągu</Button>
+                  <Button
+                    size="small"
+                    onClick={() =>
+                      setState({ ...state, isRouteModalOpen: true })
+                    }
+                  >
+                    Trasa twojego pociągu
+                  </Button>
+                  <RouteModalComponent
+                    isOpen={state.isRouteModalOpen}
+                    stations={ticket.stations}
+                    handleModalClose={handleRouteModalClose}
+                  />
                 </Box>
               </Box>
               <Box
