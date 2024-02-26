@@ -237,14 +237,14 @@ class App extends Component<any, any> {
           <Tab label="Zwrócone" />
         </Tabs>
         <CustomTabPanel value={this.state.tabNumber} index={0}>
-          <Box>
+          <Box sx={{ display: "flex", minWidth: "550px" }}>
             <TextField
               autoFocus
               value={this.state.searchPhrase}
               onChange={this.handleSearchPhraseChange}
               id="input-with-icon-textfield"
               label="Szukaj biletu"
-              sx={{ width: "40vw" }}
+              sx={{ flexGrow: 3 }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">
@@ -259,7 +259,7 @@ class App extends Component<any, any> {
                 this.setState({ ...this.state, isFilterModalOpen: true })
               }
               variant="outlined"
-              sx={{ mt: "12px", ml: "6px", width: "19.4vw" }}
+              sx={{ mt: "12px", ml: "6px", flexGrow: 1 }}
               endIcon={<FilterList />}
             >
               Filtry
@@ -275,6 +275,7 @@ class App extends Component<any, any> {
               display: "flex",
               justifyContent: "flex-end",
               margin: "0.5rem 0",
+              minWidth: "540px",
             }}
           >
             <Button
@@ -299,6 +300,7 @@ class App extends Component<any, any> {
                   <Box
                     id=""
                     sx={{
+                      minWidth: "500px",
                       border: "1px solid lightgrey",
                       padding: "1rem",
                       margin: "1rem",
