@@ -12,6 +12,7 @@ import {
   Box,
   Button,
   InputAdornment,
+  Snackbar,
   Tab,
   Tabs,
   TextField,
@@ -96,6 +97,7 @@ function App() {
     classFilters: [true, true],
     isRouteModalOpen: false,
     isAddTicketModalOpen: false,
+    isCreateShoppingProfileSnackbarOpen: false,
   });
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -162,7 +164,6 @@ function App() {
   }
 
   function handleAddTicketModalClose(classType: string) {
-    console.log("test");
     const ticket: Ticket = {
       id: new Date().valueOf(),
       ticketNumber: new Date().valueOf(),
@@ -418,6 +419,12 @@ function App() {
                     </Box>
                     <Box>
                       <Button
+                        onClick={() =>
+                          setState({
+                            ...state,
+                            isCreateShoppingProfileSnackbarOpen: true,
+                          })
+                        }
                         variant="contained"
                         size="large"
                         sx={{
@@ -429,6 +436,21 @@ function App() {
                       >
                         Stwórz profil zakupowy
                       </Button>
+                      <Snackbar
+                        open={state.isCreateShoppingProfileSnackbarOpen}
+                        autoHideDuration={3000}
+                        onClose={() =>
+                          setState({
+                            ...state,
+                            isCreateShoppingProfileSnackbarOpen: false,
+                          })
+                        }
+                        message="Stworzono profil zakupowy"
+                        anchorOrigin={{
+                          vertical: "bottom",
+                          horizontal: "center",
+                        }}
+                      />
                     </Box>
                     <Accordion>
                       <AccordionSummary
