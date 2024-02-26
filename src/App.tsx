@@ -98,7 +98,6 @@ function App() {
     isRouteModalOpen: false,
     isAddTicketModalOpen: false,
     isCreateShoppingProfileSnackbarOpen: false,
-    isRemoveTicketSnackbarOpen: false,
   });
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -250,7 +249,6 @@ function App() {
         state.searchPhrase,
         state.classFilters
       ),
-      isRemoveTicketSnackbarOpen: true,
     });
   }
 
@@ -506,21 +504,6 @@ function App() {
                           >
                             Zwróć bilet
                           </Button>
-                          <Snackbar
-                            open={state.isCreateShoppingProfileSnackbarOpen}
-                            autoHideDuration={3000}
-                            onClose={() =>
-                              setState({
-                                ...state,
-                                isCreateShoppingProfileSnackbarOpen: false,
-                              })
-                            }
-                            message="Zwrócono bilet"
-                            anchorOrigin={{
-                              vertical: "bottom",
-                              horizontal: "center",
-                            }}
-                          />
                         </AccordionDetails>
                       </Accordion>
                     </Box>
