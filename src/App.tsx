@@ -117,17 +117,24 @@ function App() {
     }));
   };
 
-  function handleFilterModalClose(classFilters: boolean[]) {
-    setState({
-      ...state,
-      classFilters: classFilters,
-      filteredTickets: getFilteredTickets(
-        state.tickets,
-        state.searchPhrase,
-        classFilters
-      ),
-      isFilterModalOpen: false,
-    });
+  function handleFilterModalClose(
+    classFilters: boolean[],
+    isConfirmed = false
+  ) {
+    if (isConfirmed) {
+      setState({
+        ...state,
+        classFilters: classFilters,
+        filteredTickets: getFilteredTickets(
+          state.tickets,
+          state.searchPhrase,
+          classFilters
+        ),
+        isFilterModalOpen: false,
+      });
+    } else {
+      setState({ ...state, isFilterModalOpen: false });
+    }
   }
 
   function getFilteredTickets(

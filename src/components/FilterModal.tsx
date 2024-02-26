@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -86,6 +87,12 @@ function FilterModalComponent({ isOpen, classFilters, handleModalClose }) {
                 }
               />
             </Box>
+            <Button
+              sx={{ mt: 1, mr: 1 }}
+              onClick={() => handleModalClose(state.classFilters, true)}
+            >
+              Zatwierdź
+            </Button>
           </FormControl>
         </Box>
       </Box>
