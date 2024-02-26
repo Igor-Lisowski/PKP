@@ -17,6 +17,8 @@ import {
   Tabs,
   TextField,
 } from "@mui/material";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import React from "react";
 import "./App.css";
 import AddTicketModalComponent from "./components/AddTicketModal.tsx";
@@ -31,7 +33,6 @@ function App() {
     searchPhrase: "",
     tickets: [
       {
-        id: 1,
         ticketNumber: new Date().valueOf(),
         from: new Date(2024, 2, 24).toLocaleDateString(),
         start: new Date(2024, 2, 24, 13, 35, 0).toLocaleTimeString([], {
@@ -63,7 +64,6 @@ function App() {
     ],
     filteredTickets: [
       {
-        id: 1,
         ticketNumber: new Date().valueOf(),
         from: new Date(2024, 2, 24).toLocaleDateString(),
         start: new Date(2024, 2, 24, 13, 35, 0).toLocaleTimeString([], {
@@ -165,7 +165,6 @@ function App() {
 
   function handleAddTicketModalClose(classType: string) {
     const ticket: Ticket = {
-      id: new Date().valueOf(),
       ticketNumber: new Date().valueOf(),
       from: new Date().toLocaleDateString(),
       start: new Date(new Date().setHours(13, 35, 0)).toLocaleTimeString([], {
@@ -192,7 +191,7 @@ function App() {
         "Miechów",
         "Kraków Główny",
       ],
-      price: `${(classType === "Klasa 1" ? 1 : 0) + 69},00 zł`,
+      price: `${(classType === "Klasa 1" ? 100 : 0) + 69},00 zł`,
     };
     const tickets: Ticket[] = state.tickets;
     tickets.push(ticket);
@@ -215,6 +214,28 @@ function App() {
         {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
       </Box>
     );
+  }
+
+  function createPdf(ticketNumber: number) {
+    const input = document.getElementById(
+      `ticket-${ticketNumber}`
+    ) as HTMLElement;
+    html2canvas(input).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF();
+      pdf.addImage(
+        imgData,
+        "JPEG",
+        60,
+        -88,
+        0,
+        0,
+        `ticket-${ticketNumber}.pdf`,
+        undefined,
+        -90
+      );
+      pdf.save(`ticket-${ticketNumber}.pdf`);
+    });
   }
 
   return (
@@ -280,190 +301,194 @@ function App() {
         <Box sx={{ height: "72vh", overflowY: "auto" }}>
           {state.filteredTickets.map((ticket) => {
             return (
-              <Box
-                sx={{
-                  border: "1px solid lightgrey",
-                  padding: "1rem",
-                  margin: "1rem",
-                }}
-              >
+              <div id={`ticket-${ticket.ticketNumber}`}>
                 <Box
+                  id=""
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-end",
+                    border: "1px solid lightgrey",
+                    padding: "1rem",
+                    margin: "1rem",
                   }}
                 >
                   <Box
                     sx={{
-                      backgroundColor: "lightgrey",
-                      width: "fit-content",
-                      padding: "0.5rem",
-                      borderRadius: "3px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-end",
                     }}
                   >
-                    <Box component="span" sx={{ color: "blue" }}>
-                      Numer biletu
-                    </Box>
-                    &emsp;
-                    <Box component="span" sx={{ color: "darkblue" }}>
-                      {ticket.ticketNumber}
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Button
-                      size="small"
-                      onClick={() =>
-                        setState({ ...state, isRouteModalOpen: true })
-                      }
-                    >
-                      Trasa twojego pociągu
-                    </Button>
-                    <RouteModalComponent
-                      isOpen={state.isRouteModalOpen}
-                      stations={ticket.stations}
-                      handleModalClose={handleRouteModalClose}
-                    />
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    marginTop: "1rem",
-                    display: "grid",
-                    gridTemplateColumns: "2fr 1fr",
-                  }}
-                >
-                  <Box>
                     <Box
                       sx={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(3, 1fr)",
-                        gridTemplateRows: "repeat(2, 1fr)",
+                        backgroundColor: "lightgrey",
+                        width: "fit-content",
+                        padding: "0.5rem",
+                        borderRadius: "3px",
                       }}
                     >
-                      <Box sx={{ color: "blue" }}>Data</Box>
-                      <Box sx={{ color: "blue" }}>Czas</Box>
-                      <Box sx={{ color: "blue" }}>{ticket.trainClass}</Box>
-                      <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                        {ticket.from}
+                      <Box component="span" sx={{ color: "blue" }}>
+                        Numer biletu
                       </Box>
-                      <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                        {ticket.start}{" "}
-                        <ArrowForwardIos
-                          sx={{
-                            fontSize: "0.75rem",
-                            color: "darkorange",
-                          }}
-                        />{" "}
-                        {ticket.end}
-                      </Box>
-                      <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
-                        {ticket.price}
+                      &emsp;
+                      <Box component="span" sx={{ color: "darkblue" }}>
+                        {ticket.ticketNumber}
                       </Box>
                     </Box>
+                    <Box>
+                      <Button
+                        size="small"
+                        onClick={() =>
+                          setState({ ...state, isRouteModalOpen: true })
+                        }
+                      >
+                        Trasa twojego pociągu
+                      </Button>
+                      <RouteModalComponent
+                        isOpen={state.isRouteModalOpen}
+                        stations={ticket.stations}
+                        handleModalClose={handleRouteModalClose}
+                      />
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      marginTop: "1rem",
+                      display: "grid",
+                      gridTemplateColumns: "2fr 1fr",
+                    }}
+                  >
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(3, 1fr)",
+                          gridTemplateRows: "repeat(2, 1fr)",
+                        }}
+                      >
+                        <Box sx={{ color: "blue" }}>Data</Box>
+                        <Box sx={{ color: "blue" }}>Czas</Box>
+                        <Box sx={{ color: "blue" }}>{ticket.trainClass}</Box>
+                        <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
+                          {ticket.from}
+                        </Box>
+                        <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
+                          {ticket.start}{" "}
+                          <ArrowForwardIos
+                            sx={{
+                              fontSize: "0.75rem",
+                              color: "darkorange",
+                            }}
+                          />{" "}
+                          {ticket.end}
+                        </Box>
+                        <Box sx={{ fontWeight: "bold", color: "darkblue" }}>
+                          {ticket.price}
+                        </Box>
+                      </Box>
 
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "0.5rem",
+                          marginTop: "1rem",
+                        }}
+                      >
+                        <Box sx={{ color: "blue" }}>Trasa</Box>
+                        <Box>
+                          {ticket.stations[0]}{" "}
+                          <ArrowForwardIos
+                            sx={{
+                              fontSize: "0.75rem",
+                              color: "darkorange",
+                            }}
+                          />{" "}
+                          {ticket.stations[ticket.stations.length - 1]}
+                        </Box>
+                        <Box>
+                          <Box
+                            component="span"
+                            sx={{
+                              color: "darkorange",
+                              fontStyle: "italic",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            IC
+                          </Box>
+                          &nbsp;{ticket.interCityNumber}
+                        </Box>
+                      </Box>
+                    </Box>
                     <Box
                       sx={{
                         display: "flex",
                         flexDirection: "column",
                         gap: "0.5rem",
-                        marginTop: "1rem",
                       }}
                     >
-                      <Box sx={{ color: "blue" }}>Trasa</Box>
                       <Box>
-                        {ticket.stations[0]}{" "}
-                        <ArrowForwardIos
+                        <Button
+                          onClick={() => createPdf(ticket.ticketNumber)}
+                          variant="contained"
+                          size="large"
                           sx={{
-                            fontSize: "0.75rem",
+                            backgroundColor: "white",
                             color: "darkorange",
-                          }}
-                        />{" "}
-                        {ticket.stations[ticket.stations.length - 1]}
-                      </Box>
-                      <Box>
-                        <Box
-                          component="span"
-                          sx={{
-                            color: "darkorange",
-                            fontStyle: "italic",
                             fontWeight: "bold",
+                            width: "100%",
                           }}
                         >
-                          IC
-                        </Box>
-                        &nbsp;{ticket.interCityNumber}
+                          Pobierz PDF
+                        </Button>
                       </Box>
+                      <Box>
+                        <Button
+                          onClick={() =>
+                            setState({
+                              ...state,
+                              isCreateShoppingProfileSnackbarOpen: true,
+                            })
+                          }
+                          variant="contained"
+                          size="large"
+                          sx={{
+                            backgroundColor: "white",
+                            color: "darkorange",
+                            fontWeight: "bold",
+                            width: "100%",
+                          }}
+                        >
+                          Stwórz profil zakupowy
+                        </Button>
+                        <Snackbar
+                          open={state.isCreateShoppingProfileSnackbarOpen}
+                          autoHideDuration={3000}
+                          onClose={() =>
+                            setState({
+                              ...state,
+                              isCreateShoppingProfileSnackbarOpen: false,
+                            })
+                          }
+                          message="Stworzono profil zakupowy"
+                          anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "center",
+                          }}
+                        />
+                      </Box>
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMore />}
+                          sx={{ textTransform: "uppercase" }}
+                        >
+                          Inne funkcje dla tego biletu
+                        </AccordionSummary>
+                        <AccordionDetails>TODO</AccordionDetails>
+                      </Accordion>
                     </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "0.5rem",
-                    }}
-                  >
-                    <Box>
-                      <Button
-                        variant="contained"
-                        size="large"
-                        sx={{
-                          backgroundColor: "white",
-                          color: "darkorange",
-                          fontWeight: "bold",
-                          width: "100%",
-                        }}
-                      >
-                        Pobierz PDF
-                      </Button>
-                    </Box>
-                    <Box>
-                      <Button
-                        onClick={() =>
-                          setState({
-                            ...state,
-                            isCreateShoppingProfileSnackbarOpen: true,
-                          })
-                        }
-                        variant="contained"
-                        size="large"
-                        sx={{
-                          backgroundColor: "white",
-                          color: "darkorange",
-                          fontWeight: "bold",
-                          width: "100%",
-                        }}
-                      >
-                        Stwórz profil zakupowy
-                      </Button>
-                      <Snackbar
-                        open={state.isCreateShoppingProfileSnackbarOpen}
-                        autoHideDuration={3000}
-                        onClose={() =>
-                          setState({
-                            ...state,
-                            isCreateShoppingProfileSnackbarOpen: false,
-                          })
-                        }
-                        message="Stworzono profil zakupowy"
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "center",
-                        }}
-                      />
-                    </Box>
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<ExpandMore />}
-                        sx={{ textTransform: "uppercase" }}
-                      >
-                        Inne funkcje dla tego biletu
-                      </AccordionSummary>
-                      <AccordionDetails>TODO</AccordionDetails>
-                    </Accordion>
                   </Box>
                 </Box>
-              </Box>
+              </div>
             );
           })}
         </Box>
