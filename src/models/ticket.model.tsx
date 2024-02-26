@@ -1,7 +1,7 @@
 export interface Ticket {
   id: number;
   ticketNumber: number;
-  day: string;
+  from: string;
   start: string;
   end: string;
   trainClass: string;
