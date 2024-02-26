@@ -55,7 +55,7 @@ function AddTicketModalComponent({ isOpen, handleModalClose }) {
               </RadioGroup>
               <Button
                 sx={{ mt: 1, mr: 1 }}
-                onClick={() => handleModalClose(state.classType)}
+                onClick={() => handleModalClose(state.classType, true)}
               >
                 Zapisz
               </Button>

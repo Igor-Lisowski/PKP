@@ -170,48 +170,55 @@ function App() {
     setState({ ...state, isRouteModalOpen: false });
   }
 
-  function handleAddTicketModalClose(classType: string) {
-    const ticket: Ticket = {
-      ticketNumber: new Date().valueOf(),
-      from: new Date().toLocaleDateString(),
-      start: new Date(new Date().setHours(13, 35, 0)).toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "numeric",
-      }),
-      end: new Date(new Date().setHours(17, 14, 0)).toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "numeric",
-      }),
-      trainClass: classType,
-      interCityNumber: 1234,
-      stations: [
-        "Warszawa Centralna",
-        "Warszawa Zachodnia",
-        "Grodzisk Mazowiecki PKP",
-        "Żyrardów",
-        "Skierniewice",
-        "Koluszki",
-        "Tomaszów Mazowiecki",
-        "Idzikowice",
-        "Opoczno Południe",
-        "Włoszczowa Północ",
-        "Miechów",
-        "Kraków Główny",
-      ],
-      price: `${(classType === "Klasa 1" ? 100 : 0) + 69},00 zł`,
-    };
-    const tickets: Ticket[] = state.tickets;
-    tickets.push(ticket);
-    setState({
-      ...state,
-      tickets: tickets,
-      filteredTickets: getFilteredTickets(
-        tickets,
-        state.searchPhrase,
-        state.classFilters
-      ),
-      isAddTicketModalOpen: false,
-    });
+  function handleAddTicketModalClose(classType: string, isConfirmed = false) {
+    if (isConfirmed) {
+      const ticket: Ticket = {
+        ticketNumber: new Date().valueOf(),
+        from: new Date().toLocaleDateString(),
+        start: new Date(new Date().setHours(13, 35, 0)).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "numeric",
+        }),
+        end: new Date(new Date().setHours(17, 14, 0)).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "numeric",
+        }),
+        trainClass: classType,
+        interCityNumber: 1234,
+        stations: [
+          "Warszawa Centralna",
+          "Warszawa Zachodnia",
+          "Grodzisk Mazowiecki PKP",
+          "Żyrardów",
+          "Skierniewice",
+          "Koluszki",
+          "Tomaszów Mazowiecki",
+          "Idzikowice",
+          "Opoczno Południe",
+          "Włoszczowa Północ",
+          "Miechów",
+          "Kraków Główny",
+        ],
+        price: `${(classType === "Klasa 1" ? 100 : 0) + 69},00 zł`,
+      };
+      const tickets: Ticket[] = state.tickets;
+      tickets.push(ticket);
+      setState({
+        ...state,
+        tickets: tickets,
+        filteredTickets: getFilteredTickets(
+          tickets,
+          state.searchPhrase,
+          state.classFilters
+        ),
+        isAddTicketModalOpen: false,
+      });
+    } else {
+      setState({
+        ...state,
+        isAddTicketModalOpen: false,
+      });
+    }
   }
 
   function CustomTabPanel(props: TabPanelProps) {
