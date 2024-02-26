@@ -98,6 +98,7 @@ function App() {
     isRouteModalOpen: false,
     isAddTicketModalOpen: false,
     isCreateShoppingProfileSnackbarOpen: false,
+    isRemoveTicketSnackbarOpen: false,
   });
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -238,6 +239,21 @@ function App() {
     });
   }
 
+  function removeTicket(ticketIdx: number) {
+    let tickets = state.tickets;
+    tickets.splice(ticketIdx, 1);
+    setState({
+      ...state,
+      tickets: tickets,
+      filteredTickets: getFilteredTickets(
+        tickets,
+        state.searchPhrase,
+        state.classFilters
+      ),
+      isRemoveTicketSnackbarOpen: true,
+    });
+  }
+
   return (
     <Box className="container">
       <Box className="title">Moje bilety</Box>
@@ -299,7 +315,7 @@ function App() {
         </Box>
 
         <Box sx={{ height: "72vh", overflowY: "auto" }}>
-          {state.filteredTickets.map((ticket) => {
+          {state.filteredTickets.map((ticket, idx) => {
             return (
               <div id={`ticket-${ticket.ticketNumber}`}>
                 <Box
@@ -483,7 +499,29 @@ function App() {
                         >
                           Inne funkcje dla tego biletu
                         </AccordionSummary>
-                        <AccordionDetails>TODO</AccordionDetails>
+                        <AccordionDetails>
+                          <Button
+                            size="small"
+                            onClick={() => removeTicket(idx)}
+                          >
+                            Zwróć bilet
+                          </Button>
+                          <Snackbar
+                            open={state.isCreateShoppingProfileSnackbarOpen}
+                            autoHideDuration={3000}
+                            onClose={() =>
+                              setState({
+                                ...state,
+                                isCreateShoppingProfileSnackbarOpen: false,
+                              })
+                            }
+                            message="Zwrócono bilet"
+                            anchorOrigin={{
+                              vertical: "bottom",
+                              horizontal: "center",
+                            }}
+                          />
+                        </AccordionDetails>
                       </Accordion>
                     </Box>
                   </Box>
